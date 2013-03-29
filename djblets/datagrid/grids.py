@@ -181,9 +181,10 @@ class Column(object):
             unsort_url = url_prefix + ','.join(sort_list[1:])
             sort_url   = url_prefix + ','.join(sort_list)
 
-        if not self.datagrid.column_header_template_obj:
-            self.datagrid.column_header_template_obj = \
-                get_template(self.datagrid.column_header_template)
+        l_datagrid = self.datagrid
+        if not l_datagrid.column_header_template_obj:
+            l_datagrid.column_header_template_obj = \
+                get_template(l_datagrid.column_header_template)
 
         ctx = Context({
             'column': self,
@@ -194,7 +195,7 @@ class Column(object):
             'unsort_url': unsort_url,
         })
 
-        return mark_safe(self.datagrid.column_header_template_obj.render(ctx))
+        return mark_safe(l_datagrid.column_header_template_obj.render(ctx))
     header = property(get_header)
 
     def get_url_params_except(self, *params):
@@ -263,17 +264,13 @@ class Column(object):
 
         key = "%s:%s:%s:%s" % (self.last, rendered_data, url, css_class)
 
+        l_datagrid = self.datagrid
         if key not in self.cell_render_cache:
-            if not self.datagrid.cell_template_obj:
-                self.datagrid.cell_template_obj = \
-                    get_template(self.datagrid.cell_template)
+            if not l_datagrid.cell_template_obj:
+                l_datagrid.cell_template_obj = \
+                    get_template(l_datagrid.cell_template)
 
-                if not self.datagrid.cell_template_obj:
-                    logging.error("Unable to load template '%s' for datagrid "
-                                  "cell. This may be an installation issue." %
-                                  self.datagrid.cell_template)
-
-            ctx = RequestContext(self.datagrid.request, {
+            ctx = RequestContext(l_datagrid.request, {
                 'column': self,
                 'css_class': css_class,
                 'url': url,
@@ -281,7 +278,7 @@ class Column(object):
             })
 
             self.cell_render_cache[key] = \
-                mark_safe(self.datagrid.cell_template_obj.render(ctx))
+                mark_safe(l_datagrid.cell_template_obj.render(ctx))
 
         return self.cell_render_cache[key]
 
